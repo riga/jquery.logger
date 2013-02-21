@@ -1,6 +1,6 @@
 /*!
  * jQuery Logging Plugin v0.2
- * https://github.com/riga/jquery.jqlog
+ * https://github.com/riga/jquery.logger
  *
  * Copyright 2013, Marcel Rieger
  * Dual licensed under the MIT or GPL Version 3 licenses.
