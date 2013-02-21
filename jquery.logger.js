@@ -20,9 +20,8 @@ jQuery.fn.log = function(msg) {
     return self;
 };
 
-var _loggers = {};
-var _loggerNamespaces = {};
 
+var _logger;
 jQuery.Logger = function(namespace) {
 
     var global = 'global';
@@ -30,7 +29,33 @@ jQuery.Logger = function(namespace) {
     namespace = namespace || global;
     namespace = namespace.indexOf(global) === 0 ? namespace : global + splitter + namespace;
 
-    var self = _loggers[namespace];
+    var getLogger = function(_namespace) {
+        if(!_logger) {
+            return _logger;
+        }
+        var parts = _namespace.split(splitter);
+        // remove the 'global' part
+        parts.shift();
+        var logger = _logger;
+        while(parts.length) {
+            logger = logger.subLoggers()[parts.shift()];
+            if(!logger) {
+                break;
+            }
+        }
+        return logger;
+    };
+
+    var getLoggerName = function(_namespace) {
+        var parts = _namespace.split(splitter);
+        if(!parts.length) {
+            return null;
+        } else {
+            return parts.pop();
+        }
+    };
+
+    var self = getLogger(namespace);
 
     if(!self) {
         var _levels = {
@@ -43,6 +68,9 @@ jQuery.Logger = function(namespace) {
         },
         _enabled = false,
         _level = 'info',
+        _supLogger = null,
+        _subLoggers = {},
+        name = getLoggerName(namespace),
         _canLog = function(level) {
             if(!level) {
                 return enabled() && window.console;
@@ -51,24 +79,24 @@ jQuery.Logger = function(namespace) {
                 return _enabled && window.console && validLevel;
             }
         },
-        _parentLogger = function() {
-            var parts = namespace.split(splitter);
-            parts.pop();
-            return _loggers[parts.join(splitter)];
+        supLogger = function() {
+            return _supLogger;
         },
-        _subLoggers = function() {
-            var loggers = [];
-            jQuery.each(_loggers, function(key, logger) {
-                if(key != namespace && key.indexOf(namespace) === 0) {
-                    loggers.push(logger);
-                }
-            });
-            return loggers;
+        subLoggers = function() {
+            return _subLoggers;
+        },
+        setSupLogger = function(logger) {
+            _supLogger = logger;
+            return self;
+        },
+        addSubLogger = function(logger) {
+            _subLoggers[logger.name] = logger;
+            return self;
         },
         enable = function() {
             _enabled = true;
             // enable all sub loggers
-            jQuery.each(_subLoggers(), function(i, sublogger) {
+            jQuery.each(subLoggers(), function(i, sublogger) {
                 sublogger.enable();
             });
             return self;
@@ -76,7 +104,7 @@ jQuery.Logger = function(namespace) {
         disable = function() {
             _enabled = false;
             // disable all sub loggers
-            jQuery.each(_subLoggers(), function(i, sublogger) {
+            jQuery.each(subLoggers(), function(i, sublogger) {
                 sublogger.disable();
             });
             return self;
@@ -84,12 +112,18 @@ jQuery.Logger = function(namespace) {
         enabled = function() {
             return _enabled;
         },
-        level = function(level) {
-            if(!level) {
+        level = function(__level) {
+            if(!__level) {
                 return _level;
             } else {
-                if(_levels[level] || _levels[level] === 0) {
-                    _level = level;
+                if(_levels[__level] || _levels[__level] === 0) {
+                    _level = __level;
+                    // change the level of all subLoggers
+                    jQuery.each(subLoggers(), function(i, sublogger) {
+                        if(sublogger.level) {
+                            sublogger.level(__level);
+                        }
+                    });
                 }
             }
             return self;
@@ -157,12 +191,17 @@ jQuery.Logger = function(namespace) {
         };
 
         // create the logger object
-        _loggers[namespace] = self = {
+        self = {
             namespace: namespace,
+            name: name,
             enable: enable,
             disable: disable,
             enabled: enabled,
             level: level,
+            supLogger: supLogger,
+            subLoggers: subLoggers,
+            setSupLogger: setSupLogger,
+            addSubLogger: addSubLogger,
             log: log,
             debug: debug,
             info: info,
@@ -171,24 +210,29 @@ jQuery.Logger = function(namespace) {
             fatal: fatal
         };
 
-        // update the namespaces
-        var namespaces = _loggerNamespaces;
-        jQuery.each(namespace.split(splitter), function(i, subspace) {
-            if(!namespaces[subspace]) {
-                namespaces[subspace] = {};
+        // is there a supLogger for this namespace?
+        if(namespace != global) {
+            var parts = namespace.split(splitter);
+            parts.pop();
+            var supNamespace = parts.join(splitter);
+            var _supLogger = getLogger(supNamespace);
+            if(!_supLogger) {
+                _supLogger = jQuery.Logger(supNamespace);
             }
-            namespaces = namespaces[subspace];
-        });
-
-        // enable the new logger, when the parent
-        // logger is enabled and apply its level
-        var parentLogger = _parentLogger();
-        if(parentLogger && parentLogger.enabled()) {
-            enable();
-            level(parentLogger.level());
+            // add subLogger to _supLogger
+            _supLogger.addSubLogger(self);
+            // set supLogger of self
+            setSupLogger(_supLogger);
+            // enable self if _suplogger is enabled
+            if(_supLogger.enabled()) {
+                enable();
+                level(_supLogger.level());
+            }
+        } else {
+            // the logger is the global logger
+            _logger = self;
         }
 
     }
-
     return self;
 };
