@@ -141,7 +141,7 @@ jQuery.Logger = function(namespace) {
             // cut the 'global' string
             var logNamespace;
             if(namespace.indexOf(global) === 0 && namespace != global) {
-                logNamespace = namespace.replace(/global\./, '');
+                logNamespace = namespace.replace(new RegExp(global + '\\.'), '');
             }
             if(logNamespace) {
                 prefix += ' ' + logNamespace + ' -';
