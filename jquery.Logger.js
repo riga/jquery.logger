@@ -181,10 +181,11 @@ jQuery.Logger = function(namespace) {
         });
 
         // enable the new logger, when the parent
-        // logger is enabled
+        // logger is enabled and apply its level
         var parentLogger = _parentLogger();
         if(parentLogger && parentLogger.enabled()) {
             enable();
+            level(parentLogger.level());
         }
 
     }
