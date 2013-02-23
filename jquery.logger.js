@@ -9,6 +9,7 @@
  *
  */
 
+// additional logging function for use in chains
 jQuery.fn.log = function(msg) {
     if(window.console && window.console.log) {
         if(msg) {
@@ -20,15 +21,41 @@ jQuery.fn.log = function(msg) {
     return self;
 };
 
-
+// storage for the global logger
 var _logger;
+// the Logger plugin
 jQuery.Logger = function(namespace) {
 
+    // some config
     var global = 'global';
     var splitter = '.';
+    var useConsoleLevels = true;
+
+    // out log levels
+    var levels = {
+        'all': 0,
+        'debug': 2,
+        'info': 4,
+        'warning': 6,
+        'error': 8,
+        'fatal': 10
+    };
+
+    // level -> consoleLevel methods
+    var consoleMethods = {
+        'all': 'log',
+        'debug': 'debug',
+        'info': 'info',
+        'warning': 'warn',
+        'error': 'error',
+        'fatal': 'error'
+    };
+
+    // namespace default
     namespace = namespace || global;
     namespace = namespace.indexOf(global) === 0 ? namespace : global + splitter + namespace;
 
+    // dynamic getter
     var getLogger = function(_namespace) {
         if(!_logger) {
             return _logger;
@@ -46,6 +73,7 @@ jQuery.Logger = function(namespace) {
         return logger;
     };
 
+    // dynamic setter
     var getLoggerName = function(_namespace) {
         var parts = _namespace.split(splitter);
         if(!parts.length) {
@@ -55,18 +83,12 @@ jQuery.Logger = function(namespace) {
         }
     };
 
+    // try to get an existing logger
     var self = getLogger(namespace);
 
+    // create a new one?
     if(!self) {
-        var _levels = {
-            'all': 0,
-            'debug': 2,
-            'info': 4,
-            'warning': 6,
-            'error': 8,
-            'fatal': 10
-        },
-        _enabled = false,
+        var _enabled = false,
         _level = 'info',
         _supLogger = null,
         _subLoggers = {},
@@ -75,7 +97,7 @@ jQuery.Logger = function(namespace) {
             if(!level) {
                 return enabled() && window.console;
             } else {
-                var validLevel = _levels[level] >= _levels[_level];
+                var validLevel = levels[level] >= levels[_level];
                 return _enabled && window.console && validLevel;
             }
         },
@@ -116,7 +138,7 @@ jQuery.Logger = function(namespace) {
             if(!__level) {
                 return _level;
             } else {
-                if(_levels[__level] || _levels[__level] === 0) {
+                if(levels[__level] || levels[__level] === 0) {
                     _level = __level;
                     // change the level of all subLoggers
                     jQuery.each(subLoggers(), function(i, sublogger) {
@@ -132,7 +154,12 @@ jQuery.Logger = function(namespace) {
             arguments = jQuery.makeArray(arguments);
             if(_canLog(level)) {
                 arguments.unshift(_prefix(level));
-                window.console.log.apply(window.console, arguments);
+                var method = 'log';
+                if(useConsoleLevels) {
+                    method = consoleMethods[level] || method;
+                    method = window.console[method] ? method : 'log';
+                }
+                window.console[method].apply(window.console, arguments);
             }
             return self;
         },
