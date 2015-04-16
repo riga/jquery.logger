@@ -1,5 +1,5 @@
 /*!
- * jQuery Logging Plugin v0.3.2
+ * jQuery Logging Plugin v0.3.3
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
@@ -250,7 +250,7 @@
     // define a new logger
     self = {
       // current state
-      _enabled: true,
+      _enabled: false,
 
       // current level
       _level: "all",
@@ -461,6 +461,10 @@
 
     if (namespace == options.global) {
       globalLogger = self;
+
+      // the global logger is enabled by default
+      self.enable();
+
     } else {
       // find the proper parent logger
       var parts = namespace.split(options.delimitter);

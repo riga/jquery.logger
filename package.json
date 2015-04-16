@@ -1,6 +1,6 @@
 {
 	"name": "jquery-logger",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"author": "Marcel Rieger <marcelrieger@icloud.com>",
 	"description": "A simple but powerful logging plugin for jQuery with namespaces.",
 	"keywords": [
