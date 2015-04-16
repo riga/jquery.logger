@@ -1,5 +1,5 @@
 /*!
- * jQuery Logging Plugin v0.3.1
+ * jQuery Logging Plugin v0.3.2
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
@@ -411,7 +411,7 @@
 
         // determine the log method to use
         var method = "log";
-        if (options.consoleLevels) {
+        if (options.consoleMethods) {
           var consoleMethod = consoleMethods[level.toLowerCase()];
 
           if (consoleMethod in window.console) {
