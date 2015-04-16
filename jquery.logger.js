@@ -1,5 +1,5 @@
 /*!
- * jQuery Logging Plugin v0.3.0
+ * jQuery Logging Plugin v0.3.1
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
@@ -400,7 +400,13 @@
         var args = Array.prototype.slice.call(arguments);
 
         // add prefix and postfix
-        args.unshift(self._prefix(level));
+        var prefix  = self._prefix(level);
+        var postfix = self._postfix();
+        if (args.length == 0) {
+          args.push(prefix);
+        } else {
+          args[0] = prefix + " " + args[0];
+        }
         args.push(self._postfix());
 
         // determine the log method to use
