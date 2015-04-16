@@ -86,7 +86,7 @@
 
     if (namespace === undefined || namespace == options.global) {
       return options.global;
-    } else if (namespace.indexOf(prefix) != 0) {
+    } else if (namespace.indexOf(prefix) !== 0) {
       return prefix + namespace;
     } else {
       return namespace;
@@ -367,7 +367,7 @@
         // origin
         if (options.origin) {
           var origin = getOrigin();
-          if (origin != null) {
+          if (origin !== null) {
             postfix.push(origin);
           }
         }
@@ -460,7 +460,7 @@
       var parts = namespace.split(options.delimitter);
       parts.pop();
       var parentNamespace = parts.join(options.delimitter);
-      self._parent = getLogger(parentNamespace)
+      self._parent = getLogger(parentNamespace);
 
       // create if it does not exist yet
       if (!self._parent) {
