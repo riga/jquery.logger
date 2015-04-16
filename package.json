@@ -1,0 +1,19 @@
+{
+	"name": "jquery-logger",
+	"version": "0.3.0",
+	"author": "Marcel Rieger <marcelrieger@icloud.com>",
+	"description": "A simple but powerful logging plugin for jQuery with namespaces.",
+	"keywords": [
+		"jquery-plugin",
+		"logger",
+		"namespace",
+		"child logger",
+		"parent logger",
+		"line numbers"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/riga/jquery.logger.git"
+	},
+	"license": "GPL"
+}

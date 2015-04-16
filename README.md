@@ -1,6 +1,6 @@
-# jQuery.Logger (v0.3.0)
+# jQuery.Logger
 
-A simple but powerful logging plugin for jQuery.
+A simple but powerful logging plugin for jQuery with namespaces.
 
 
 ## Examples
