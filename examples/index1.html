@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Logger Test 1</title>
+
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="../jquery.logger.js"></script>
+
+    <script>
+      var print = function() {
+        console.log.apply(console, arguments);
+      };
+
+      $(function() {
+
+        // overwrite default config
+        $.Logger({ timestamps: true,  });
+
+        // create the global logger, i.e. w/o any namespace
+        var globalLogger = $.Logger();
+
+        // print level and state
+        print(globalLogger.level(), globalLogger.enabled());
+        // => "all", true
+
+        // print name and namespace
+        print(globalLogger.name(), globalLogger.namespace());
+        // => "global", "global"
+
+        // log something
+        globalLogger.info("my first log");
+
+        // disable the logger
+        globalLogger.disable();
+
+        // log something that won't be shown
+        globalLogger.info("this won't be shown");
+
+        // enable again
+        globalLogger.enable();
+
+        // create another logger
+        var myLogger = $.Logger("foo");
+
+        // now, myLogger is a child logger of the global one
+        print(globalLogger.child("foo") == myLogger);
+        // => true
+        print(myLogger.parent() == globalLogger);
+        // => true
+
+        // log something with myLogger
+        myLogger.debug("i'm also a logger");
+
+        // when we disable the global logger, myLogger is also disabled
+        globalLogger.disable();
+        myLogger.debug("this won't be shown as well");
+        globalLogger.enable();
+        myLogger.debug("but we can see this one");
+      });
+    </script>
+  </head>
+
+</html>
