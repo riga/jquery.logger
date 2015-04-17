@@ -1,11 +1,9 @@
 /*!
- * jQuery Logging Plugin v0.3.3
+ * jQuery Logging Plugin v0.4.0
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
- * Dual licensed under the MIT or GPL Version 3 licenses.
- * http://www.opensource.org/licenses/mit-license
- * http://www.opensource.org/licenses/GPL-3.0
+ * MIT licensed, http://www.opensource.org/licenses/mit-license
  *
  */
 
@@ -31,14 +29,17 @@
 
     // use appropriate console logging methods instead of the standard log method,
     // the mapping is defined in `consoleMethods`
-    consoleMethods: true,
+    useConsoleMethods: true,
 
-    // use timestamps in logs
-    timestamps: true,
+    // show namespaces in logs
+    showNamespace: true,
+
+    // show timestamps in logs
+    showTimestamp: true,
 
     // experimental
     // show file name and line number of the origin
-    origin: true
+    showOrigin: true
   };
 
 
@@ -343,21 +344,23 @@
         var prefix = "";
 
         // timestamp
-        if (options.timestamps) {
+        if (options.showTimestamp) {
           prefix += "[" + timestamp() + "] ";
         }
 
         // level
-        prefix += level.toUpperCase() + " - ";
+        prefix += level.toUpperCase();
 
         // namespace w/o global namespace
-        var namespace = self.namespace();
-        if (self != globalLogger) {
-          namespace = namespace.substr(options.global.length + options.delimitter.length);
+        if (options.showNamespace) {
+          var namespace = self.namespace();
+          if (self != globalLogger) {
+            namespace = namespace.substr(options.global.length + options.delimitter.length);
+          }
+          prefix += " - " + namespace;
         }
-        prefix += namespace + " ";
 
-        return prefix + "-";
+        return prefix + " -";
       },
 
       // creates the postfix for all logs (origin)
@@ -365,7 +368,7 @@
         var postfix = [];
 
         // origin
-        if (options.origin) {
+        if (options.showOrigin) {
           var origin = getOrigin();
           if (origin != null) {
             postfix.push(origin);
@@ -411,7 +414,7 @@
 
         // determine the log method to use
         var method = "log";
-        if (options.consoleMethods) {
+        if (options.useConsoleMethods) {
           var consoleMethod = consoleMethods[level.toLowerCase()];
 
           if (consoleMethod in window.console) {

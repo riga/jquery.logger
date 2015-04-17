@@ -1,6 +1,6 @@
 {
 	"name": "jquery-logger",
-	"version": "0.3.3",
+	"version": "0.4.0",
 	"author": "Marcel Rieger <marcelrieger@icloud.com>",
 	"description": "A simple but powerful logging plugin for jQuery with namespaces.",
 	"keywords": [
@@ -15,5 +15,5 @@
 		"type": "git",
 		"url": "https://github.com/riga/jquery.logger.git"
 	},
-	"license": "GPL"
+	"license": "MIT"
 }

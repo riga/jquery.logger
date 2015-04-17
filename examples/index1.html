@@ -16,7 +16,7 @@
       $(function() {
 
         // overwrite default config
-        $.Logger({ timestamps: true,  });
+        $.Logger({ showTimestamp: true, showNamespace: true, showOrigin: true });
 
         // create the global logger, i.e. w/o any namespace
         var globalLogger = $.Logger();

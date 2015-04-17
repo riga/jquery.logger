@@ -81,14 +81,17 @@ $.Logger({
   delimitter: ".",
 
   // use appropriate console logging methods instead of the standard log method,
-  consoleMethods: true,
+  useConsoleMethods: true,
 
-  // use timestamps in logs
-  timestamps: true,
+  // show namespaces in logs
+  showNamespace: true,
+
+  // show timestamps in logs
+  showTimestamp: true,
 
   // experimental
   // show file name and line number of the origin
-  origin: true
+  showOrigin: true
 });
 ```
 
@@ -144,6 +147,11 @@ $.Logger({
 - Source hosted at [GitHub](https://github.com/riga/jquery.logger)
 - Report issues, questions, feature requests on
 [GitHub Issues](https://github.com/riga/jquery.logger/issues)
+
+
+# License
+
+[MIT](http://www.opensource.org/licenses/mit-license).
 
 
 # Authors
