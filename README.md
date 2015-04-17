@@ -126,7 +126,7 @@ $.Logger({
     > Disable this and all its child loggers.
 
 * `level([level])`
-    > When `level` is given, sets the log level to that value. Possible values: `"all"`, `"debug"`, `"info"`, `"warning"`, `"error"`, `"fatal"`. When no argument is passed, the current log level is returned.
+    > When `level` is given, the log level is set to that value. Possible values: `"all"`, `"debug"`, `"info"`, `"warning"`, `"error"`, `"fatal"`. When no argument is passed, the current log level is returned.
 
 * `levels()`
     > Returns all valid log levels mapped to their numerical representation.
@@ -139,6 +139,11 @@ $.Logger({
 
 * `all | debug | info | warning | error | fatal(...)`
     > Shorthands that wrap around `log` for specific levels.
+
+* `originOffset([offset])`, *experimental*
+    >  The context that invoked a log (the *origin*) is determined by parsing the stack trace of a newly created error instance. The first few lines in that stack describe the internal invocation queue of this plugin. In the current implementation, the 5th line is the one that caused the actual log. However, in some cases (e.g. when logging a deprecation warning) it is useful to see the origin of an earlier invocation in the queue. This can be achieved by setting `originOffset` to a numerical value that is added to the stack line index (5th line -> `4`) for the next log. After that, the offset is reset to `0` again.
+
+    > When `offset` is given, the origin offset is set to that value. When no argument is passed, the current origin offset is returned.
 
 
 

@@ -1,5 +1,5 @@
 /*!
- * jQuery Logging Plugin v0.4.0
+ * jQuery Logging Plugin v0.4.1
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
@@ -182,25 +182,33 @@
 
   /**
    * Helper function that returns the file name and the line number of the code line that
-   * invoked a log.
+   * invoked a log formatted as "file.js:line:col".
    * Experimental. Tested on Chrome 41.0.2272.118, FireFox 37.0.1 and Safari 8.0.5.
    *
+   * @param {number} [offset=0] - Offset for finding the context that invoked the log. Due to the
+   *  invocation queue of this plugin, we're normally interested in the 5th line of the stack that
+   *  contains our protocol and host. If you want to shift that position, e.g. when logging a
+   *  deprecation warning, use an offset of 1.
    * @returns {string|null}
    */
   var stackRE  = new RegExp(window.location.protocol + "//" + window.location.host);
   var originRE = new RegExp("^.*" + window.location.protocol + "//" + window.location.host
                             + ".+/([^/]+:\\d+:\\d+).*$");
-  var getOrigin = function() {
+  var getOrigin = function(offset) {
+    // default offset
+    if (offset === undefined) {
+      offset = 0;
+    }
+
     // create the stack
     var stack = String((new Error()).stack).split("\n").map(function(msg) {
       return msg.trim();
     });
 
-    // we're only interested in the 5th line that contains a url
-    // (the number 5 depends on the invocation structure)
+    // filter to get the line of intereset
     var line = stack.filter(function(line, i) {
       return stackRE.test(line);
-    })[4];
+    })[4 + offset];
 
     if (!line) {
       return null;
@@ -267,6 +275,10 @@
 
       // child loggers
       _children: {},
+
+      // experimental
+      // offset the for the origin determination of the next log
+      _originOffset: 0,
 
       // name getter
       name: function() {
@@ -339,6 +351,21 @@
         return self;
       },
 
+      // experimental
+      // origin offset getter/setter
+      originOffset: function(offset) {
+        if (offset === undefined) {
+          // getter
+          return self._originOffset;
+
+        } else {
+          // setter
+          self._originOffset = offset;
+        }
+
+        return self;
+      },
+
       // creates the prefix for all logs (timestamp, level and namespace)
       _prefix: function(level) {
         var prefix = "";
@@ -369,7 +396,7 @@
 
         // origin
         if (options.showOrigin) {
-          var origin = getOrigin();
+          var origin = getOrigin(self._originOffset);
           if (origin != null) {
             postfix.push(origin);
           }
@@ -424,6 +451,10 @@
 
         // log
         window.console[method].apply(window.console, args);
+
+        // experimental
+        // set the origin offset to 0
+        self._originOffset = 0;
 
         return self;
       },
