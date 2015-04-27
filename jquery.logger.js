@@ -24,7 +24,7 @@
     // name of the global namespace
     global: "global",
 
-    // delimitter that seperates namespaces
+    // delimitter that separates namespaces
     delimitter: ".",
 
     // use appropriate console logging methods instead of the standard log method,
@@ -542,6 +542,10 @@
       self.level(self._parent.level());
     }
 
+
+    /**
+     * Return the created shortcuts.
+     */
 
     return self;
   };
