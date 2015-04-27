@@ -91,7 +91,11 @@ $.Logger({
 
   // experimental
   // show file name and line number of the origin
-  showOrigin: true
+  showOrigin: true,
+  
+  // experimental
+  // cut query string from origin
+  cutQuery: true
 });
 ```
 

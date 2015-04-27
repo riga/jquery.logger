@@ -1,5 +1,5 @@
 /*!
- * jQuery Logging Plugin v0.4.1
+ * jQuery Logging Plugin v0.4.2
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
@@ -39,7 +39,11 @@
 
     // experimental
     // show file name and line number of the origin
-    showOrigin: true
+    showOrigin: true,
+
+    // experimental
+    // cut query string from origin
+    cutQuery: true
   };
 
 
@@ -194,6 +198,7 @@
   var stackRE  = new RegExp(window.location.protocol + "//" + window.location.host);
   var originRE = new RegExp("^.*" + window.location.protocol + "//" + window.location.host
                             + ".+/([^/]+:\\d+:\\d+).*$");
+  var queryRE  = new RegExp("^([^/]+)(\\?.*):\\d+:\\d+$");
   var getOrigin = function(offset) {
     // default offset
     if (offset === undefined) {
@@ -221,7 +226,20 @@
       return null;
     }
 
-    return match[1];
+    var origin = match[1];
+
+    // cut query
+    if (options.cutQuery) {
+      match = origin.match(queryRE);
+
+      if (match) {
+        var l1 = match[1].length;
+        var l2 = match[2].length;
+        origin = match[0].substr(0, l1) + match[0].substr(l1 + l2);
+      }
+    }
+
+    return origin;
   };
 
 
@@ -432,12 +450,13 @@
         // add prefix and postfix
         var prefix  = self._prefix(level);
         var postfix = self._postfix();
+
         if (args.length == 0) {
           args.push(prefix);
         } else {
           args[0] = prefix + " " + args[0];
         }
-        args.push(self._postfix());
+        args.push(postfix);
 
         // determine the log method to use
         var method = "log";
