@@ -1,5 +1,5 @@
 /*!
- * jQuery Logging Plugin v0.4.2
+ * jQuery Logging Plugin v0.4.3
  * https://github.com/riga/jquery.logger
  *
  * Copyright 2015, Marcel Rieger
@@ -502,8 +502,21 @@
      */
 
     $.each(levels, function(level) {
-      self[level] = function() {
+      var fn = self[level] = function() {
         return self._log.call(self, level, arguments);
+      };
+
+      // create a custom "bind" function that does the same as the original one
+      // but also updates the origin offset
+      fn._bind = fn.bind;
+
+      fn.bind = function(thisArg) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return function() {
+          args.push.apply(args, Array.prototype.slice.call(arguments));
+          self.originOffset(1);
+          fn.apply(thisArg, args);
+        };
       };
     });
 
